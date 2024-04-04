@@ -1,34 +1,76 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  NotFoundException,
+} from '@nestjs/common';
 import { FlightsService } from './flights.service';
 import { CreateFlightDto } from './dto/create-flight.dto';
 import { UpdateFlightDto } from './dto/update-flight.dto';
-
-@Controller('flights')
+@Controller('/api/v1/flights')
 export class FlightsController {
   constructor(private readonly flightsService: FlightsService) {}
 
   @Post()
-  create(@Body() createFlightDto: CreateFlightDto) {
+  async create(@Body() createFlightDto: CreateFlightDto) {
     return this.flightsService.create(createFlightDto);
   }
 
   @Get()
-  findAll() {
+  async findAll() {
     return this.flightsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.flightsService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    try {
+      const flight = await this.flightsService.findOne(+id);
+      return flight;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        return {
+          statusCode: error.getStatus(),
+          message: error.message,
+        };
+      }
+      throw error;
+    }
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFlightDto: UpdateFlightDto) {
-    return this.flightsService.update(+id, updateFlightDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateFlightDto: UpdateFlightDto,
+  ) {
+    try {
+      return await this.flightsService.update(+id, updateFlightDto);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        return {
+          statusCode: error.getStatus(),
+          message: error.message,
+        };
+      }
+      throw error;
+    }
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.flightsService.remove(+id);
+  async remove(@Param('id') id: string) {
+    try {
+      return await this.flightsService.remove(+id);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        return {
+          statusCode: error.getStatus(),
+          message: error.message,
+        };
+      }
+      throw error;
+    }
   }
 }

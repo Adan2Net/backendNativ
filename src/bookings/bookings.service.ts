@@ -1,26 +1,46 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Booking } from './entities/booking.entity';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 
 @Injectable()
 export class BookingsService {
-  create(createBookingDto: CreateBookingDto) {
-    return 'This action adds a new booking';
+  constructor(
+    @InjectRepository(Booking) // Inyecta el repositorio de reservas
+    private readonly bookingRepository: Repository<Booking>,
+  ) {}
+
+  async create(createBookingDto: CreateBookingDto): Promise<Booking> {
+    const booking = this.bookingRepository.create(createBookingDto);
+    return await this.bookingRepository.save(booking);
   }
 
-  findAll() {
-    return `This action returns all bookings`;
+  async findAll(): Promise<Booking[]> {
+    return await this.bookingRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} booking`;
+  async findOne(id: number): Promise<Booking> {
+    const booking = await this.bookingRepository.findOne({ where: { id } });
+    if (!booking) {
+      throw new NotFoundException(`Booking with id ${id} not found`);
+    }
+    return booking;
   }
 
-  update(id: number, updateBookingDto: UpdateBookingDto) {
-    return `This action updates a #${id} booking`;
+  async update(
+    id: number,
+    updateBookingDto: UpdateBookingDto,
+  ): Promise<Booking> {
+    const booking = await this.findOne(id);
+    this.bookingRepository.merge(booking, updateBookingDto);
+    return await this.bookingRepository.save(booking);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} booking`;
+  async remove(id: number): Promise<string> {
+    const booking = await this.findOne(id);
+    await this.bookingRepository.delete(booking);
+    return `Booking with id ${id} deleted successfully`;
   }
 }
