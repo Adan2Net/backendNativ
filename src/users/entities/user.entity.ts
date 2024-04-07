@@ -21,6 +21,12 @@ export class User {
   @Column()
   address: string;
 
+  @Column({ nullable: true })
+  date_of_birth: Date;
+
+  @Column({ nullable: true })
+  gender: string;
+
   @OneToMany(() => Booking, (booking) => booking.user)
   bookings: Booking[];
 }

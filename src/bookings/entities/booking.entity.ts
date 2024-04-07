@@ -13,6 +13,9 @@ export class Booking {
   @Column()
   status: string;
 
+  @Column()
+  paymentMethod: string;
+
   @ManyToOne(() => User, (user) => user.bookings)
   user: User;
 

@@ -16,6 +16,21 @@ export class Flight {
   airline: string;
 
   @Column()
+  departureTime: string;
+
+  @Column()
+  arrivalTime: string;
+
+  @Column()
+  flightNumber: string;
+
+  @Column()
+  aircraftType: string;
+
+  @Column()
+  duration: number;
+
+  @Column()
   date: Date;
 
   @Column()
@@ -27,6 +42,9 @@ export class Flight {
     scale: 2,
   })
   price: number;
+
+  @Column()
+  status: string;
 
   @OneToMany(() => Booking, (booking) => booking.flight)
   bookings: Booking[];

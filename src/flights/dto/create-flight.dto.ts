@@ -3,6 +3,12 @@ export class CreateFlightDto {
   destination: string;
   airline: string;
   date: Date;
+  departureTime: string;
+  arrivalTime: string;
+  flightNumber: string;
+  aircraftType: string;
+  duration: number;
   capacity: number;
   price: number;
+  status: string;
 }
